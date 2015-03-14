@@ -63,4 +63,18 @@ describe 'consul::check' do
       expect { should raise_error(Puppet::Error) }
     }
   end
+  describe 'with ttl and service_id' do
+    let(:params) {{
+      'ttl' => '30s',
+      'service_id' => 'some_service'
+    }}
+    it {
+      should contain_file("/etc/consul/check_my_check.json") \
+        .with_content(/"id" *: *"my_check"/)
+        .with_content(/"name" *: *"my_check"/)
+        .with_content(/"check" *: *{/)
+        .with_content(/"ttl" *: *"30s"/)
+        .with_content(/"service_id": "some_service"/)
+    }
+  end
 end

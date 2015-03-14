@@ -19,11 +19,15 @@
 # [*notes*]
 #   Human readable description of the check
 #
+# [*service_id*]
+#   Binds a check to an existing service
+#
 define consul::check(
-  $ttl      = undef,
-  $script   = undef,
-  $interval = undef,
-  $notes    = undef,
+  $ttl        = undef,
+  $script     = undef,
+  $interval   = undef,
+  $notes      = undef,
+  $service_id = undef,
 ) {
   include consul
   $id = $title
@@ -56,6 +60,14 @@ define consul::check(
     fail('One of ttl or interval must be defined.')
   }
 
+  if $service_id {
+    $service_id_hash = {
+      service_id => $service_id,
+    }
+  } else {
+    $service_id_hash = {}
+  }
+
   if $notes {
     $notes_hash = {
       notes => $notes
@@ -65,7 +77,7 @@ define consul::check(
   }
 
   $check_hash = {
-    check => merge($basic_hash, $check_definition, $notes_hash)
+    check => merge($basic_hash, $check_definition, $notes_hash, $service_id_hash)
   }
 
   File[$consul::config_dir] ->
